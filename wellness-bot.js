@@ -1,12 +1,45 @@
-
 //require('dotenv').load();
+var Botkit = require('botkit');
+
+var controller = Botkit.slackbot({
+    debug: true
+});
+
+// connect the bot to a stream of messages, token is saved in heroku config
+controller.spawn({
+    token: process.env.SLACK_INTEGRATION_TOKEN
+}).startRTM();
+
+// give the bot something to listen for.
+
+controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
+    bot.reply(message,"Hi Everybody!");
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*//require('dotenv').load();
 var Botkit = require('botkit');
 //var axios = require('axios');
 
 var controller = Botkit.slackbot({
     debug: true
 });
-/*console.log('before psot');
+console.log('before psot');
 axios.post('https://api.askfavor.com/api/v2/login.php',
     {
         email: 'test',
@@ -18,7 +51,7 @@ axios.post('https://api.askfavor.com/api/v2/login.php',
     .catch(function(response) {
         convo.say('Error');
     });
-console.log('after post');*/
+console.log('after post');
 // connect the bot to a stream of messages
 controller.spawn({
     token: process.env.SLACK_INTEGRATION_TOKEN
@@ -30,7 +63,7 @@ controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],fu
     bot.reply(message,"Hello.");
 });
 
-
+*/
 /*controller.hears('login', ['direct_message', 'direct_mention', 'mention', 'ambient'], function (bot, message) {
     bot.startConversation(message, startLoginConvo);
 });
