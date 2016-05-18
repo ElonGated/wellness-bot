@@ -35,7 +35,7 @@ This bot demonstrates many of the core features of Botkit:
   Read all about it here:
     -> http://howdy.ai/botkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+/*
 
 if (!process.env.token) {
     console.log('Error: Specify token in environment');
@@ -216,4 +216,82 @@ function formatUptime(uptime) {
 
     uptime = uptime + ' ' + unit;
     return uptime;
-}
+}  
+
+*/
+
+
+
+
+
+
+
+//require('dotenv').load();
+var Botkit = require('botkit');
+//var axios = require('axios');
+
+var controller = Botkit.slackbot({
+    debug: true
+});
+/*console.log('before psot');
+axios.post('https://api.askfavor.com/api/v2/login.php',
+    {
+        email: 'test',
+        password: 'password'
+    })
+    .then(function(response) {
+        convo.say(JSON.stringify(response.body));
+    })
+    .catch(function(response) {
+        convo.say('Error');
+    });
+console.log('after post');*/
+// connect the bot to a stream of messages
+controller.spawn({
+    token: process.env.SLACK_INTEGRATION_TOKEN
+}).startRTM();
+
+// give the bot something to listen for.
+controller.hears('hello', 'direct_message,direct_mention,mention', function (bot, message) {
+    bot.reply(message, 'Hello yourself.');
+});
+
+controller.hears('login', ['direct_message', 'direct_mention', 'mention', 'ambient'], function (bot, message) {
+    bot.startConversation(message, startLoginConvo);
+});
+
+startLoginConvo = function (response, convo) {
+    promptEmail(response, convo, {key: 'email'});
+    convo.next();
+};
+
+/*promptEmail = function (response, convo) {
+    convo.ask('Please enter your email.', function (response, convo) {
+        promptPassword(response, convo, {key: 'password'});
+        convo.next();
+    });
+};
+
+promptPassword = function (response, convo) {
+    convo.ask('Please enter your password.', function (response, convo) {
+        console.log('Entered password');
+        console.log(convo.extractResponses());
+        var responses = convo.extractResponses();
+        login('test', 'test');
+    });
+};
+
+login = function(email, password) {
+    console.log('axios');
+    axios.post('https://api.askfavor.com/api/v2/login.php',
+        {
+            email: email,
+            password: password
+        })
+        .then(function(response) {
+            convo.say(JSON.stringify(response.body));
+        })
+        .catch(function(response) {
+            convo.say('Error');
+        });
+};*/
