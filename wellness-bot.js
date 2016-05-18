@@ -1,3 +1,88 @@
+
+//require('dotenv').load();
+var Botkit = require('botkit');
+//var axios = require('axios');
+
+var controller = Botkit.slackbot({
+    debug: true
+});
+/*console.log('before psot');
+axios.post('https://api.askfavor.com/api/v2/login.php',
+    {
+        email: 'test',
+        password: 'password'
+    })
+    .then(function(response) {
+        convo.say(JSON.stringify(response.body));
+    })
+    .catch(function(response) {
+        convo.say('Error');
+    });
+console.log('after post');*/
+// connect the bot to a stream of messages
+controller.spawn({
+    token: process.env.SLACK_INTEGRATION_TOKEN
+}).startRTM();
+
+// give the bot something to listen for.
+
+controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
+    bot.reply(message,"Hello.");
+});
+
+
+/*controller.hears('login', ['direct_message', 'direct_mention', 'mention', 'ambient'], function (bot, message) {
+    bot.startConversation(message, startLoginConvo);
+});
+
+startLoginConvo = function (response, convo) {
+    promptEmail(response, convo, {key: 'email'});
+    convo.next();
+};
+*/
+/*promptEmail = function (response, convo) {
+    convo.ask('Please enter your email.', function (response, convo) {
+        promptPassword(response, convo, {key: 'password'});
+        convo.next();
+    });
+};
+
+promptPassword = function (response, convo) {
+    convo.ask('Please enter your password.', function (response, convo) {
+        console.log('Entered password');
+        console.log(convo.extractResponses());
+        var responses = convo.extractResponses();
+        login('test', 'test');
+    });
+};
+
+login = function(email, password) {
+    console.log('axios');
+    axios.post('https://api.askfavor.com/api/v2/login.php',
+        {
+            email: email,
+            password: password
+        })
+        .then(function(response) {
+            convo.say(JSON.stringify(response.body));
+        })
+        .catch(function(response) {
+            convo.say('Error');
+        });
+};*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
            ______     ______     ______   __  __     __     ______
           /\  == \   /\  __ \   /\__  _\ /\ \/ /    /\ \   /\__  _\
@@ -220,78 +305,118 @@ function formatUptime(uptime) {
 
 */
 
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           ______     ______     ______   __  __     __     ______
+          /\  == \   /\  __ \   /\__  _\ /\ \/ /    /\ \   /\__  _\
+          \ \  __<   \ \ \/\ \  \/_/\ \/ \ \  _"-.  \ \ \  \/_/\ \/
+           \ \_____\  \ \_____\    \ \_\  \ \_\ \_\  \ \_\    \ \_\
+            \/_____/   \/_____/     \/_/   \/_/\/_/   \/_/     \/_/
+This is a sample Slack bot built with Botkit.
+This bot demonstrates many of the core features of Botkit:
+* Connect to Slack using the real time API
+* Receive messages based on "spoken" patterns
+* Send a message with attachments
+* Send a message via direct message (instead of in a public channel)
+# RUN THE BOT:
+  Get a Bot token from Slack:
+    -> http://my.slack.com/services/new/bot
+  Run your bot from the command line:
+    token=<MY TOKEN> node demo_bot.js
+# USE THE BOT:
+  Find your bot inside Slack to send it a direct message.
+  Say: "Hello"
+  The bot will reply "Hello!"
+  Say: "Attach"
+  The bot will send a message with a multi-field attachment.
+  Send: "dm"
+  The bot will reply with a direct message.
+  Make sure to invite your bot into other channels using /invite @<my bot>!
+# EXTEND THE BOT:
+  Botkit has many features for building cool and useful bots!
+  Read all about it here:
+    -> http://howdy.ai/botkit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*
+var Botkit = require('../lib/Botkit.js');
 
 
-
-
-
-
-//require('dotenv').load();
-var Botkit = require('botkit');
-//var axios = require('axios');
+if (!process.env.token) {
+  console.log('Error: Specify token in environment');
+  process.exit(1);
+}
 
 var controller = Botkit.slackbot({
-    debug: true
+ debug: false
 });
-/*console.log('before psot');
-axios.post('https://api.askfavor.com/api/v2/login.php',
-    {
-        email: 'test',
-        password: 'password'
-    })
-    .then(function(response) {
-        convo.say(JSON.stringify(response.body));
-    })
-    .catch(function(response) {
-        convo.say('Error');
-    });
-console.log('after post');*/
-// connect the bot to a stream of messages
+
 controller.spawn({
-    token: process.env.SLACK_INTEGRATION_TOKEN
-}).startRTM();
-
-// give the bot something to listen for.
-controller.hears('hello', 'direct_message,direct_mention,mention', function (bot, message) {
-    bot.reply(message, 'Hello yourself.');
+  token: process.env.token
+}).startRTM(function(err) {
+  if (err) {
+    throw new Error(err);
+  }
 });
 
-controller.hears('login', ['direct_message', 'direct_mention', 'mention', 'ambient'], function (bot, message) {
-    bot.startConversation(message, startLoginConvo);
+
+controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
+    bot.reply(message,"Hello.");
 });
 
-startLoginConvo = function (response, convo) {
-    promptEmail(response, convo, {key: 'email'});
-    convo.next();
-};
+controller.hears(['attach'],['direct_message','direct_mention'],function(bot,message) {
 
-/*promptEmail = function (response, convo) {
-    convo.ask('Please enter your email.', function (response, convo) {
-        promptPassword(response, convo, {key: 'password'});
-        convo.next();
-    });
-};
+  var attachments = [];
+  var attachment = {
+    title: 'This is an attachment',
+    color: '#FFCC99',
+    fields: [],
+  };
 
-promptPassword = function (response, convo) {
-    convo.ask('Please enter your password.', function (response, convo) {
-        console.log('Entered password');
-        console.log(convo.extractResponses());
-        var responses = convo.extractResponses();
-        login('test', 'test');
-    });
-};
+  attachment.fields.push({
+    label: 'Field',
+    value: 'A longish value',
+    short: false,
+  });
 
-login = function(email, password) {
-    console.log('axios');
-    axios.post('https://api.askfavor.com/api/v2/login.php',
-        {
-            email: email,
-            password: password
-        })
-        .then(function(response) {
-            convo.say(JSON.stringify(response.body));
-        })
-        .catch(function(response) {
-            convo.say('Error');
-        });
-};*/
+  attachment.fields.push({
+    label: 'Field',
+    value: 'Value',
+    short: true,
+  });
+
+  attachment.fields.push({
+    label: 'Field',
+    value: 'Value',
+    short: true,
+  });
+
+  attachments.push(attachment);
+
+  bot.reply(message,{
+    text: 'See below...',
+    attachments: attachments,
+  },function(err,resp) {
+    console.log(err,resp);
+  });
+});
+
+controller.hears(['dm me'],['direct_message','direct_mention'],function(bot,message) {
+  bot.startConversation(message,function(err,convo) {
+    convo.say('Heard ya');
+  });
+
+  bot.startPrivateConversation(message,function(err,dm) {
+    dm.say('Private reply!');
+  });
+
+});
+
+
+*/
+
+
+
+
+
+
+
+
