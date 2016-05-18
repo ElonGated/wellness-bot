@@ -1,0 +1,1 @@
+wellness-bot is a Slack RTM bot which records wellness commands input by Slack users and sends those commands back out at some interval of time. The goal being to prevent prolonged sitting, lax posture, afternoon brain fog; wellness-bot may even create some modicum of joy in the process.
