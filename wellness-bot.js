@@ -1,5 +1,10 @@
 //require('dotenv').load();
 var Botkit = require('botkit');
+var redis = require('redis');
+
+// connect to data
+var redisURL = process.env.REDIS_URL //|| 'redis://localhost:6379';
+var redisClient = redis.createClient(redisURL);
 
 var controller = Botkit.slackbot({
     debug: true
@@ -13,6 +18,7 @@ controller.spawn({
 // give the bot something to listen for.
 
 controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
+    console.log(message);
     bot.reply(message,"Hi Everybody!");
 });
 
