@@ -3,9 +3,9 @@ var Botkit = require('botkit');
 var redis = require('redis');
 
 // connect to data
-var redisURL = process.env.REDIS_URL || 'redis://localhost:6379';
+/*var redisURL = process.env.REDIS_URL || 'redis://localhost:6379';
 var redisClient = redis.createClient(redisURL);
-
+*/
 var controller = Botkit.slackbot({
     debug: true
 });
