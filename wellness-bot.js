@@ -95,7 +95,7 @@ controller.hears(['list', 'activities'], ['direct_message'],function(bot,message
 //remove from activity list
 controller.hears(['delete'], ['direct_message'],function(bot,message){
     console.log(message);
-    bot.say(message, 'Ok, here\'s the list:');
+/*    bot.say(message, 'Ok, here\'s the list:');
         // display ordered list
         redisClient.lrange('activitylist', 0, -1, function(err,reply) {
             for(var i in reply){
@@ -103,7 +103,7 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
                 bot.reply(message, number + '. ' + reply[i]);
             }
         });
-        // ask what to delete
+*/        // ask what to delete
     bot.startConversation(message, function(err, convo) {
         convo.ask('What\'s the number of the activity you want me to delete?', function(response, convo) {
             var responseNumber = Number(response);
@@ -121,6 +121,13 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
                     pattern: bot.utterances.no,
                     callback: function(response, convo) {
                         convo.say('Oh, ok I\'ll leave it in then.')
+                        convo.stop();
+                    }
+                },
+                {
+                    default: true,
+                    callback: function(response, convo) {
+                        convo.repeat();
                         convo.next();
                     }
                 }
@@ -138,7 +145,7 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
 
 
 
-
+branch
 
 
 
