@@ -95,7 +95,7 @@ controller.hears(['list', 'activities'], ['direct_message'],function(bot,message
 //remove from activity list
 controller.hears(['delete'], ['direct_message'],function(bot,message){
     console.log(message);
-/*    bot.say(message, 'Ok, here\'s the list:');
+    bot.reply(message, 'Ok, here\'s the list:');
         // display ordered list
         redisClient.lrange('activitylist', 0, -1, function(err,reply) {
             for(var i in reply){
@@ -103,25 +103,28 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
                 bot.reply(message, number + '. ' + reply[i]);
             }
         });
-*/        // ask what to delete
+    // ask what to delete
     bot.startConversation(message, function(err, convo) {
         convo.ask('What\'s the number of the activity you want me to delete?', function(response, convo) {
-            var responseNumber = Number(response);
-            redisClient.lrange('activitylist', responseNumber, function(err, reply) {
-                convo.ask('Sure you want to remove: ' + reply + ' ?', [
+            console.log(response);
+            var responseNumber = Number(response.text) - 1;
+            console.log(responseNumber);
+            redisClient.lrange('activitylist', responseNumber, responseNumber, function(err, reply) {
+                convo.ask('Sure you want to remove: \"' + reply + '\" ?', [
                 {
                     pattern: bot.utterances.yes,
                     callback: function(response, convo) {
-                        convo.say('Yeah, I never liked that one either.')
-                        redisClient.lrem('activitylist', String(reply));
+                        convo.say('Yeah, I never liked that one either.');
+                        console.log(reply);
+                        //redisClient.lrem('activitylist', String(reply));
                         convo.next();
                     }
                 },
                 {
                     pattern: bot.utterances.no,
                     callback: function(response, convo) {
-                        convo.say('Oh, ok I\'ll leave it in then.')
-                        convo.stop();
+                        convo.say('Oh, ok I can leave it in then.');
+                        convo.next();
                     }
                 },
                 {
@@ -145,7 +148,6 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
 
 
 
-branch
 
 
 
