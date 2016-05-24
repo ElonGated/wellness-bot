@@ -115,8 +115,7 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
                     pattern: bot.utterances.yes,
                     callback: function(response, convo) {
                         convo.say('Yeah, I never liked that one either.');
-                        console.log(reply);
-                        //redisClient.lrem('activitylist', String(reply));
+                        redisClient.lrem('activitylist', 0, reply);
                         convo.next();
                     }
                 },
