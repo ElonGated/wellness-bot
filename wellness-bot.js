@@ -19,8 +19,8 @@ var bot = controller.spawn({
         console.log('redis is connected');
     });
     
+    // set up the timer for delivering activity messages
     var sayActivityList = function(){
-        // set up the timer for delivering activity messages
         redisClient.llen('activitylist', function(err, length) {
             var i = 0;
             var timer = setInterval(function(err) { 
@@ -29,28 +29,24 @@ var bot = controller.spawn({
                 if(i==length){
                     clearInterval(timer);
                 }
-            }, 2000);
+            }, 3900000);
 
             var sayActivity = function(activity) {
-                console.log('timer works!!!! ' + activity);
-
+                console.log('timer count!!!! ' + activity);
                 redisClient.lrange('activitylist', activity, activity, function(err,reply) {
-                    // for(var activity in reply) {    
-                        bot.say(
-                            {
-                                text: '<!here> ' + reply,
-                                channel: 'G1BL6B1U3',
-                            }
-                        );
-                    // }
+                    bot.say(
+                        {
+                            text: '<!here> ' + reply,
+                            channel: 'G1BL6B1U3',
+                        }
+                    );
                 });
             }
-            // }
         });
     }
     setInterval(function(err) { 
         sayActivityList();            
-    }, 10000);  
+    }, 86400000);  
 });
 
 // give the bot something to listen for.
