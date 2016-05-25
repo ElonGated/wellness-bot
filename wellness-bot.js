@@ -19,76 +19,55 @@ var bot = controller.spawn({
         console.log('redis is connected');
     });
     
-    // set up the timer for delivering activity messages
-    var i = 0;
-    var timer = setInterval(function() { sayActivity(i++) }, 5000);
+    var sayActivityList = function(){
+        // set up the timer for delivering activity messages
+        redisClient.llen('activitylist', function(err, length) {
+            var i = 0;
+            var timer = setInterval(function(err) { 
+                sayActivity(i)
+                i++;
+                if(i==length){
+                    clearInterval(timer);
+                }
+            }, 2000);
 
-    var sayActivity = function(activity) {
-        console.log('timer works!!!! ' + activity);
-        redisClient.lrange('activitylist', activity, activity, function(err,reply) {
-            for(var activity in reply) {    
-                bot.say(
-                    {
-                        
-                        text: '<!here> ' + reply[activity],
-                        channel: 'G1BL6B1U3',
-                    }
-                );
+            var sayActivity = function(activity) {
+                console.log('timer works!!!! ' + activity);
+
+                redisClient.lrange('activitylist', activity, activity, function(err,reply) {
+                    // for(var activity in reply) {    
+                        bot.say(
+                            {
+                                text: '<!here> ' + reply,
+                                channel: 'G1BL6B1U3',
+                            }
+                        );
+                    // }
+                });
             }
+            // }
         });
     }
+    setInterval(function(err) { 
+        sayActivityList();            
+    }, 10000);  
 });
 
 // give the bot something to listen for.
-controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
+controller.hears(['hello','hi'],['direct_message','direct_mention','mention', 'ambient'],function(bot,message) {
     console.log(message);
     bot.reply(message, 'Hi Everybody!');
 });
 
-// sign up to 'users' data object
-controller.hears(['sign up', 'check in'],['direct_message'],function(bot,message) {
+// help command 
+controller.hears(['help', 'commands'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
     console.log(message);
-    redisClient.hget(message.user, 'name', function(err, reply) {
-        console.log(reply + ' this should be the user name');
-    
-        if (reply === message.user) {
-            bot.reply(message, 'Looks like you\'re already signed up.');
-        } else {
-
-            redisClient.hmset(message.user, {
-                'name': message.user,
-                'dmchannel': message.channel,
-                'signuptime': message.ts,
-                'ogmessage': message.text
-            });
-            bot.reply(message, {
-                text: 'You got it Dude!',
-                username: 'wellness-bot',
-                icon_emoji: ':yougotitdude:',
-            });
-        };
-    });
+    bot.reply(message, 'this is where the help will go :P');
 });
-
-// unsubscribe
-controller.hears(['unsubscribe'],['direct_message'],function(bot,message) {
-    console.log(message);
-    redisClient.hget(message.user, 'name', function(err, reply){
-
-        if (reply != message.user) {
-            bot.reply(message, 'I don\'t think you\'re on my list. If you\'d like to subscribe say \'sign up\'.');
-        } else {
-            redisClient.del(message.user);
-            bot.reply(message, 'Farewell.');
-        };
-    });
-
-});
-
 
 // add to activity list
 var activity = '';
-controller.hears(['activity', 'add'], ['direct_message'],function(bot,message) {
+controller.hears(['activity', 'add'], ['direct_mention', 'mention'],function(bot,message) {
     console.log(message);
     if (message.text) {
         var activity = message.text.slice(4);
@@ -100,7 +79,7 @@ controller.hears(['activity', 'add'], ['direct_message'],function(bot,message) {
 });
 
 // display the activity list, shifted by 1 for humans
-controller.hears(['list', 'activities'], ['direct_message'],function(bot,message){
+controller.hears(['list', 'activities'], ['direct_mention', 'mention', 'ambient'],function(bot,message){
     console.log(message);
     redisClient.lrange('activitylist', 0, -1, function(err,reply) {
         for(var i in reply){
@@ -112,7 +91,7 @@ controller.hears(['list', 'activities'], ['direct_message'],function(bot,message
 });
 
 //remove from activity list
-controller.hears(['delete'], ['direct_message'],function(bot,message){
+controller.hears(['delete'], ['direct_mention'],function(bot,message){
     console.log(message);
     bot.reply(message, 'Ok, here\'s the list:');
         // display ordered list
@@ -189,6 +168,55 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
   match: [ 'hi', index: 0, input: 'hi' ] }
 
 */
+
+
+
+// !depricated! sign up to 'users' data object; 
+/*controller.hears(['sign up', 'check in'],['direct_message'],function(bot,message) {
+    console.log(message);
+    redisClient.hget(message.user, 'name', function(err, reply) {
+        console.log(reply + ' this should be the user name');
+    
+        if (reply === message.user) {
+            bot.reply(message, 'Looks like you\'re already signed up.');
+        } else {
+
+            redisClient.hmset(message.user, {
+                'name': message.user,
+                'dmchannel': message.channel,
+                'signuptime': message.ts,
+                'ogmessage': message.text
+            });
+            bot.reply(message, {
+                text: 'You got it Dude!',
+                username: 'wellness-bot',
+                icon_emoji: ':yougotitdude:',
+            });
+        };
+    });
+});
+
+// unsubscribe
+controller.hears(['unsubscribe'],['direct_message'],function(bot,message) {
+    console.log(message);
+    redisClient.hget(message.user, 'name', function(err, reply){
+
+        if (reply != message.user) {
+            bot.reply(message, 'I don\'t think you\'re on my list. If you\'d like to subscribe say \'sign up\'.');
+        } else {
+            redisClient.del(message.user);
+            bot.reply(message, 'Farewell.');
+        };
+    });
+
+});
+*/
+
+
+
+
+
+
 
 
 
