@@ -13,13 +13,31 @@ var controller = Botkit.slackbot({
 // connect the bot to a stream of messages, token is saved in .env file
 var bot = controller.spawn({
     token: process.env.SLACK_INTEGRATION_TOKEN
-}).startRTM();
+}).startRTM(function(err) {
+    // connect to redis db and check connection
+    redisClient.on('connect', function() {
+        console.log('redis is connected');
+    });
+    
+    // set up the timer for delivering activity messages
+    var i = 0;
+    var timer = setInterval(function() { sayActivity(i++) }, 5000);
 
-// connect to redis db and check connection
-redisClient.on('connect', function() {
-    console.log('redis is connected');
+    var sayActivity = function(activity) {
+        console.log('timer works!!!! ' + activity);
+        redisClient.lrange('activitylist', activity, activity, function(err,reply) {
+            for(var activity in reply) {    
+                bot.say(
+                    {
+                        
+                        text: '<!here> ' + reply[activity],
+                        channel: 'G1BL6B1U3',
+                    }
+                );
+            }
+        });
+    }
 });
-
 
 // give the bot something to listen for.
 controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
@@ -39,6 +57,7 @@ controller.hears(['sign up', 'check in'],['direct_message'],function(bot,message
 
             redisClient.hmset(message.user, {
                 'name': message.user,
+                'dmchannel': message.channel,
                 'signuptime': message.ts,
                 'ogmessage': message.text
             });
@@ -139,44 +158,37 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
         });
     });
 });
-/*
-// set up the timer for delivering activity messages
-//controller.on('message_received', function(bot, message) {
-    var i = 0
-    var timer = setInterval(function() { sayActivity(i++) }, 1000);
-
-    var sayActivity = function(activity) {
-        console.log('timer works!!!! ' + activity);
-        redisClient.lrange('activitylist', activity, activity, function(err,reply) {
-            for(var activity in reply) {
-                bot.say(
-                    {
-                        text: reply[activity],
-                        channel: 'D1A1U282D',
-                        //user: 'U0ASPPDFY'
-                    }
-                );
-            };
-        });
-    }
-//});*/
 
 
-/*bot.say(
-                    {
-                        text: 'yo human.',
-                        channel: 'D1A1U282D',
-                        //user: 'U0ASPPDFY'
-                    }
-        );
 
+
+
+
+
+
+
+/*garrett info type: 'message',
+  channel: 'D1A21PRJM',
+  user: 'U0N6V46A1',
+  text: 'sign up',
+  ts: '1464190002.000006',
+  team: 'T026FTM0X',
+  event: 'direct_message',
+  match: [ 'sign up', index: 0, input: 'sign up' ] }
 
 */
 
+/*toyourhealthdev
+{ type: 'message',
+  channel: 'G1BL6B1U3',
+  user: 'U0ASPPDFY',
+  text: 'hi',
+  ts: '1464191434.000005',
+  team: 'T026FTM0X',
+  event: 'ambient',
+  match: [ 'hi', index: 0, input: 'hi' ] }
 
-
-
-
+*/
 
 
 
