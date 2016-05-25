@@ -11,7 +11,7 @@ var controller = Botkit.slackbot({
 });
 
 // connect the bot to a stream of messages, token is saved in .env file
-controller.spawn({
+var bot = controller.spawn({
     token: process.env.SLACK_INTEGRATION_TOKEN
 }).startRTM();
 
@@ -139,31 +139,39 @@ controller.hears(['delete'], ['direct_message'],function(bot,message){
         });
     });
 });
+/*
+// set up the timer for delivering activity messages
+//controller.on('message_received', function(bot, message) {
+    var i = 0
+    var timer = setInterval(function() { sayActivity(i++) }, 1000);
+
+    var sayActivity = function(activity) {
+        console.log('timer works!!!! ' + activity);
+        redisClient.lrange('activitylist', activity, activity, function(err,reply) {
+            for(var activity in reply) {
+                bot.say(
+                    {
+                        text: reply[activity],
+                        channel: 'D1A1U282D',
+                        //user: 'U0ASPPDFY'
+                    }
+                );
+            };
+        });
+    }
+//});*/
 
 
+/*bot.say(
+                    {
+                        text: 'yo human.',
+                        channel: 'D1A1U282D',
+                        //user: 'U0ASPPDFY'
+                    }
+        );
 
 
-
-
-
-
-
-
-
-
-
-
-/*var makeLemonade = function(glasses) {
-    return glasses * 2;
-}
-
-
-makeLemonade(2);
 */
-
-
-
-
 
 
 
