@@ -19,34 +19,67 @@ var bot = controller.spawn({
         console.log('redis is connected');
     });
     
-    // set up the timer for delivering activity messages
-    var sayActivityList = function(){
-        redisClient.llen('activitylist', function(err, length) {
-            var i = 0;
-            var timer = setInterval(function(err) { 
-                sayActivity(i)
-                i++;
-                if(i==length){
-                    clearInterval(timer);
+    var sayActivity = function(activity) {
+        console.log('activity index!!!! ' + activity);
+        redisClient.lrange('activitylist', activity, activity, function(err,reply) {
+            bot.say(
+                {
+                    text: '<!here> ' + reply,
+                    channel: 'G1BL6B1U3',
                 }
-            }, 3900000);
+            );
+        });
+    }    
+    
 
-            var sayActivity = function(activity) {
-                console.log('timer count!!!! ' + activity);
-                redisClient.lrange('activitylist', activity, activity, function(err,reply) {
-                    bot.say(
-                        {
-                            text: '<!here> ' + reply,
-                            channel: 'G1BL6B1U3',
-                        }
-                    );
-                });
+/*    var time = 10000;
+    var timer = setInterval(function(err){
+        redisClient.llen('activitylist', function(err, length) {
+            for (i = length; i > length; i--) {
+                sayActivity(i);
             }
+        console.log('!*!*!*!*!*!**!*!*!*!*!!*!*' + time);
+        time = 2000;
+
+        });
+    }, time);
+});
+*/
+
+
+
+/*    var sayActivityList = function(){
+            var i = 0;
+            do {
+                sayActivity(i)
+                i++; 
+            }
+            while (i<length);    
+            
+
+
         });
     }
     setInterval(function(err) { 
         sayActivityList();            
-    }, 86400000);  
+    }, 6000);//86400000);  
+});
+*/
+
+
+
+
+
+    // set up the timer for delivering activity messages
+    var sayActivityList = function(){
+        redisClient.llen('activitylist', function(err, length) {
+            var randomnumber = Math.floor(Math.random() * (length - 0 + 1)) + 0;
+                sayActivity(randomnumber);
+        });
+    }
+    setInterval(function(err) { 
+        sayActivityList();            
+    }, 3600000);  
 });
 
 // give the bot something to listen for.
