@@ -58,7 +58,9 @@ controller.hears(['^hello(.*)$','^hi(.*)$'],['direct_message','direct_mention','
 controller.hears(['^help(.*)$', '^(.*) help(.*)$', '^(.*) commands(.*)$', '^commands(.*)$'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
     console.log(message);
     bot.reply(message, 'Ok, here\'s what I can do:');
-    bot.reply(message, 'add');
+    bot.reply(message, 'Tell me \'add\' to contribute an activity to the list. Try to remember that I have to repeat it :flushed:');
+    bot.reply(message, 'To see the list we have so far say \'list\'.');
+    bot.reply(message, 'If you really don\'t like something on the list say \'delete\', and I\'ll help you remove it.');
 });
 
 // add to activity list
