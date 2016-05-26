@@ -19,6 +19,7 @@ var bot = controller.spawn({
         console.log('redis is connected');
     });
     
+    // uses the arg to pull the item on the activitylist associated with that number
     var sayActivity = function(activity) {
         console.log('activity index!!!! ' + activity);
         redisClient.lrange('activitylist', activity, activity, function(err,reply) {
@@ -30,105 +31,87 @@ var bot = controller.spawn({
             );
         });
     }    
-    
 
-/*    var time = 10000;
-    var timer = setInterval(function(err){
-        redisClient.llen('activitylist', function(err, length) {
-            for (i = length; i > length; i--) {
-                sayActivity(i);
-            }
-        console.log('!*!*!*!*!*!**!*!*!*!*!!*!*' + time);
-        time = 2000;
-
-        });
-    }, time);
-});
-*/
-
-
-
-/*    var sayActivityList = function(){
-            var i = 0;
-            do {
-                sayActivity(i)
-                i++; 
-            }
-            while (i<length);    
-            
-
-
-        });
-    }
-    setInterval(function(err) { 
-        sayActivityList();            
-    }, 6000);//86400000);  
-});
-*/
-
-
-
-
-
-    // set up the timer for delivering activity messages
+    // feeds sayActivity a random number from 0 - n, n being the length of the activitylist
     var sayActivityList = function(){
         redisClient.llen('activitylist', function(err, length) {
-            var randomnumber = Math.floor(Math.random() * (length - 0 + 1)) + 0;
+            var randomnumber = Math.floor(Math.random() * (length));
                 sayActivity(randomnumber);
         });
     }
+    
+    // sets the timer for when the activity is said by the bot
+    //var intervalRandomizer = Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000;
+
     setInterval(function(err) { 
-        sayActivityList();            
+        sayActivityList(); 
     }, 3600000);  
 });
 
 // give the bot something to listen for.
-controller.hears(['hello','hi'],['direct_message','direct_mention','mention', 'ambient'],function(bot,message) {
+controller.hears(['^hello(.*)$','^hi(.*)$'],['direct_message','direct_mention','mention', 'ambient'],function(bot,message) {
     console.log(message);
     bot.reply(message, 'Hi Everybody!');
 });
 
 // help command 
-controller.hears(['help', 'commands'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
+controller.hears(['^help(.*)$', '^(.*) help(.*)$', '^(.*) commands(.*)$', '^commands(.*)$'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
     console.log(message);
-    bot.reply(message, 'this is where the help will go :P');
+    bot.reply(message, 'Ok, here\'s what I can do:');
+    bot.reply(message, 'add');
 });
 
 // add to activity list
 var activity = '';
-controller.hears(['activity', 'add'], ['direct_mention', 'mention'],function(bot,message) {
+controller.hears(['^add(.*)$'], ['direct_mention', 'mention', 'ambient'],function(bot,message) {
     console.log(message);
-    if (message.text) {
-        var activity = message.text.slice(4);
-    }
-    redisClient.rpush(['activitylist', activity], function(err, reply) {
-        console.log(reply);
+    bot.startConversation(message, function(err, convo){
+        convo.ask('What activity should I add?', function(response, convo){
+            console.log(response);
+            if (response.text === 'cancel') {   
+                convo.stop();
+                return;             
+            } 
+            redisClient.rpush(['activitylist', response.text], function(err, reply) {
+                console.log(reply);
+                convo.say('Sounds like fun!');
+                });
+            convo.next();
+        });
     });
-    bot.reply(message, 'Sounds like fun!');
 });
 
 // display the activity list, shifted by 1 for humans
-controller.hears(['list', 'activities'], ['direct_mention', 'mention', 'ambient'],function(bot,message){
+controller.hears(['^list(,*)$', '^activities(.*)$'], ['direct_mention', 'mention', 'ambient'],function(bot,message){
     console.log(message);
+    bot.reply(message, ':scroll: :heart: :scroll:')
+
     redisClient.lrange('activitylist', 0, -1, function(err,reply) {
         for(var i in reply){
             var number = Number(i) + 1;
             bot.reply(message, number + '. ' + reply[i]);
         }
+        bot.reply(message, ':scroll: :heart: :scroll:')
     });
 
 });
 
 //remove from activity list
+controller.hears(['^(.*)delete(.*)$', '^(.*)remove(.*)$'], ['ambient'],function(bot,message){
+    bot.reply(message, 'If you want me to remove an activity you\'ll have to say \'@wellness-bot:delete\'')
+});
 controller.hears(['delete'], ['direct_mention'],function(bot,message){
     console.log(message);
     bot.reply(message, 'Ok, here\'s the list:');
+    bot.reply(message, ':scroll: :skull_and_crossbones: :scroll:')
+    
         // display ordered list
         redisClient.lrange('activitylist', 0, -1, function(err,reply) {
             for(var i in reply){
                 var number = Number(i) + 1;
                 bot.reply(message, number + '. ' + reply[i]);
             }
+        bot.reply(message, ':scroll: :skull_and_crossbones: :scroll:')
         });
     // ask what to delete
     bot.startConversation(message, function(err, convo) {
@@ -142,7 +125,7 @@ controller.hears(['delete'], ['direct_mention'],function(bot,message){
                     pattern: bot.utterances.yes,
                     callback: function(response, convo) {
                         convo.say('Yeah, I never liked that one either.');
-                        redisClient.lrem('activitylist', 0, reply);
+                        redisClient.lrem('activitylist', -1, reply);
                         convo.next();
                     }
                 },
