@@ -41,15 +41,17 @@ var bot = controller.spawn({
     }
     
     // sets the timer for when the activity is said by the bot
-    //var intervalRandomizer = Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000;
 
     setInterval(function(err) { 
         sayActivityList(); 
-    }, 3600000);  
+    }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000);//3600000);  
 });
 
 // give the bot something to listen for.
-controller.hears(['^hello(.*)$','^hi(.*)$'],['direct_message','direct_mention','mention', 'ambient'],function(bot,message) {
+controller.hears(['(.*)'],['direct_message'], function(bot,message){
+    bot.reply(message, 'Hi! I\'m not much for 1 on 1 chatting...I prefer a crowd. Head over to our channel \'to_your_health\'! When you\'re there say \'help\' for more info about me. :heart:');
+});
+controller.hears(['^hello (.*)$','^hi (.*)$', '^hi$', '^hello$'],['direct_mention','mention', 'ambient'],function(bot,message) {
     console.log(message);
     bot.reply(message, 'Hi Everybody!');
 });
@@ -57,15 +59,16 @@ controller.hears(['^hello(.*)$','^hi(.*)$'],['direct_message','direct_mention','
 // help command 
 controller.hears(['^help(.*)$', '^(.*) help(.*)$', '^(.*) commands(.*)$', '^commands(.*)$'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
     console.log(message);
-    bot.reply(message, 'Ok, here\'s what I can do:');
-    bot.reply(message, 'Tell me \'add\' to contribute an activity to the list. Try to remember that I have to repeat it :flushed:');
+    bot.reply(message, 'Ok, here\'s what I can do: (btw, you have to say \'@wellness-bot:\' before any of the commands below)');
+    bot.reply(message, 'Say \'add\' to contribute an activity to the list. Try to remember that I have to repeat it later :flushed:');
     bot.reply(message, 'To see the list we have so far say \'list\'.');
     bot.reply(message, 'If you really don\'t like something on the list say \'delete\', and I\'ll help you remove it.');
+    bot.reply(message, '...PS If you\'re tired of messages popping up from a Slack channel, just type \'/mute\'.');
 });
 
 // add to activity list
 var activity = '';
-controller.hears(['^add(.*)$'], ['direct_mention', 'mention', 'ambient'],function(bot,message) {
+controller.hears(['^add(.*)$'], ['direct_mention'],function(bot,message) {
     console.log(message);
     bot.startConversation(message, function(err, convo){
         convo.ask('What activity should I add?', function(response, convo){
@@ -84,24 +87,20 @@ controller.hears(['^add(.*)$'], ['direct_mention', 'mention', 'ambient'],functio
 });
 
 // display the activity list, shifted by 1 for humans
-controller.hears(['^list(,*)$', '^activities(.*)$'], ['direct_mention', 'mention', 'ambient'],function(bot,message){
+controller.hears(['^list(,*)$', '^activities(.*)$'], ['direct_mention'],function(bot,message){
     console.log(message);
     bot.reply(message, ':scroll: :heart: :scroll:')
 
     redisClient.lrange('activitylist', 0, -1, function(err,reply) {
         for(var i in reply){
             var number = Number(i) + 1;
-            bot.reply(message, number + '. ' + reply[i]);
+            bot.reply(message, number.toString() + '. ' + reply[i]);
         }
         bot.reply(message, ':scroll: :heart: :scroll:')
     });
-
 });
 
 //remove from activity list
-controller.hears(['^(.*)delete(.*)$', '^(.*)remove(.*)$'], ['ambient'],function(bot,message){
-    bot.reply(message, 'If you want me to remove an activity you\'ll have to say \'@wellness-bot:delete\'')
-});
 controller.hears(['delete'], ['direct_mention'],function(bot,message){
     console.log(message);
     bot.reply(message, 'Ok, here\'s the list:');
@@ -160,16 +159,6 @@ controller.hears(['delete'], ['direct_mention'],function(bot,message){
 
 
 
-/*garrett info type: 'message',
-  channel: 'D1A21PRJM',
-  user: 'U0N6V46A1',
-  text: 'sign up',
-  ts: '1464190002.000006',
-  team: 'T026FTM0X',
-  event: 'direct_message',
-  match: [ 'sign up', index: 0, input: 'sign up' ] }
-
-*/
 
 /*toyourhealthdev
 { type: 'message',
@@ -186,6 +175,7 @@ controller.hears(['delete'], ['direct_mention'],function(bot,message){
 
 
 // !depricated! sign up to 'users' data object; 
+
 /*controller.hears(['sign up', 'check in'],['direct_message'],function(bot,message) {
     console.log(message);
     redisClient.hget(message.user, 'name', function(err, reply) {
