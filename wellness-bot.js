@@ -40,11 +40,13 @@ var bot = controller.spawn({
         });
     }
     
-    // sets the timer for when the activity is said by the bot
-
-    setInterval(function(err) { 
-        sayActivityList(); 
-    }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000);//3600000);  
+    // sets the timer for when the activity is said by the bot during business-ish hours 
+    var t = moment();
+    if (t.day()<1||t.day()>5||t.hour()<7||t.hour()>=19) { 
+        setInterval(function(err) { 
+            sayActivityList(); 
+        }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000);//3600000);  
+    }
 });
 
 // give the bot something to listen for.
