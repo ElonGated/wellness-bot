@@ -1,6 +1,8 @@
 require('dotenv').load();
 var Botkit = require('botkit');
 var redis = require('redis');
+var moment = require('moment');
+moment().format();
 
 // connect to data
 var redisURL = process.env.REDIS_URL || 'redis://localhost:6379';
@@ -21,32 +23,64 @@ var bot = controller.spawn({
     
     // uses the arg to pull the item on the activitylist associated with that number
     var sayActivity = function(activity) {
-        console.log('activity index!!!! ' + activity);
+        console.log('!*! activity index -> ' + activity);
         redisClient.lrange('activitylist', activity, activity, function(err,reply) {
             bot.say(
                 {
                     text: '<!here> ' + reply,
-                    channel: 'G1BL6B1U3',
+                    channel: 'G1BL6B1U3', //this is the designation for to_your_health_dev
                 }
             );
         });
     }    
 
+
     // feeds sayActivity a random number from 0 - n, n being the length of the activitylist
-    var sayActivityList = function(){
+    //even
+    var sayActivityListEven = function(){
         redisClient.llen('activitylist', function(err, length) {
             var randomnumber = Math.floor(Math.random() * (length));
+            if (randomnumber % 2 != 0 && randomnumber != length) {
+                randomnumber += 1;
                 sayActivity(randomnumber);
+            } else if (randomnumber % 2 != 0 && randomnumber == length) {
+                randomnumber -= 1;
+                sayActivity(randomnumber);
+            } else {
+                sayActivity(randomnumber);
+            }
         });
     }
-    
-    // sets the timer for when the activity is said by the bot during business-ish hours 
-    var t = moment();
-    if (t.day()<1||t.day()>5||t.hour()<7||t.hour()>=19) { 
-        setInterval(function(err) { 
-            sayActivityList(); 
-        }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000);//3600000);  
+    var sayActivityListOdd = function(){
+        redisClient.llen('activitylist', function(err, length) {
+            var randomnumber = Math.floor(Math.random() * (length));
+            if (randomnumber % 2 == 0 && randomnumber != 0) {
+                randomnumber -= 1;
+                sayActivity(randomnumber);
+            } else if (randomnumber % 2 == 0 && randomnumber == 0) {
+                randomnumber += 1;
+                sayActivity(randomnumber);
+            } else {
+                sayActivity(randomnumber);
+            }
+        });
     }
+
+    // sets the timer for when the activity is said by the bot during business-ish hours 
+    setInterval(function(err) { 
+        var t = moment();
+        if (t.day() > 0 && t.day() < 6 && t.hour() > 6 && t.hour() < 19) { 
+                    if (t.hour() % 2 == 0) {
+                        //console.log(t.hour());
+                        sayActivityListEven(); 
+                    } else {
+                        //console.log(t.hour());
+                        sayActivityListOdd();
+                    }
+        } else {
+            return;
+        }  
+    }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000);//3600000);  
 });
 
 // give the bot something to listen for.
@@ -59,7 +93,7 @@ controller.hears(['^hello (.*)$','^hi (.*)$', '^hi$', '^hello$'],['direct_mentio
 });
 
 // help command 
-controller.hears(['^help(.*)$', '^(.*) help(.*)$', '^(.*) commands(.*)$', '^commands(.*)$'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
+controller.hears(['^help$'], ['direct_message','direct_mention','mention', 'ambient'],function(bot,message){
     console.log(message);
     bot.reply(message, 'Ok, here\'s what I can do: (btw, you have to say \'@wellness-bot:\' before any of the commands below)');
     bot.reply(message, 'Say \'add\' to contribute an activity to the list. Try to remember that I have to repeat it later :flushed:');
