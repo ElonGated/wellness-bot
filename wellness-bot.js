@@ -28,7 +28,8 @@ var bot = controller.spawn({
             bot.say(
                 {
                     text: '<!here> ' + reply,
-                    channel: 'G1BL6B1U3', //this is the designation for to_your_health_dev
+                    // to_your_health: G1BMRM341; to_your_health_dev: G1BL6B1U3;
+                    channel: 'G1BL6B1U3',
                 }
             );
         });
@@ -39,7 +40,7 @@ var bot = controller.spawn({
     //even
     var sayActivityListEven = function(){
         redisClient.llen('activitylist', function(err, length) {
-            var randomnumber = Math.floor(Math.random() * (length));
+            var randomnumber = (Math.floor(Math.random() * (length - 0 + 1)) + 0)-1;
             if (randomnumber % 2 != 0 && randomnumber != length) {
                 randomnumber += 1;
                 sayActivity(randomnumber);
@@ -53,7 +54,7 @@ var bot = controller.spawn({
     }
     var sayActivityListOdd = function(){
         redisClient.llen('activitylist', function(err, length) {
-            var randomnumber = Math.floor(Math.random() * (length));
+            var randomnumber = (Math.floor(Math.random() * (length - 0 + 1)) + 0)-1;
             if (randomnumber % 2 == 0 && randomnumber != 0) {
                 randomnumber -= 1;
                 sayActivity(randomnumber);
