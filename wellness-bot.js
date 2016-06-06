@@ -28,8 +28,8 @@ var bot = controller.spawn({
             bot.say(
                 {
                     text: '<!here> ' + reply,
-                    // to_your_health: G1BMRM341; to_your_health_dev: G1BL6B1U3;
-                    channel: 'G1BL6B1U3',
+                    // to_your_health: G1BMRM341; to_your_health_dev: G1E2WPCEP;
+                    channel: 'G1E2WPCEP',
                 }
             );
         });
