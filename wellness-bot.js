@@ -81,7 +81,7 @@ var bot = controller.spawn({
         } else {
             return;
         }  
-    }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000);//3600000);  
+    }, Math.floor(Math.random() * (3900000 - 3300000 + 1)) + 3300000); 
 });
 
 // give the bot something to listen for.
