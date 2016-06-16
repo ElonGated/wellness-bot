@@ -1,4 +1,4 @@
-require('dotenv').load();
+/*require('dotenv').load();*/
 var Botkit = require('botkit');
 var redis = require('redis');
 var moment = require('moment');
