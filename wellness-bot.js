@@ -5,7 +5,7 @@ var moment = require('moment');
 moment().format();
 
 // connect to data
-var redisURL = process.env.REDIS_URL || 'redis://localhost:6379';
+var redisURL = process.env.REDIS_URL /*|| 'redis://localhost:6379'*/;
 var redisClient = redis.createClient();
 
 var controller = Botkit.slackbot({
