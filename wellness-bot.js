@@ -1,12 +1,12 @@
 /*require('dotenv').load();*/
 var Botkit = require('botkit');
-var redis = require('redis');
+var redisClient = require('redis').createClient(process.env.REDIS_URL);
 var moment = require('moment');
 moment().format();
 
 // connect to data
-var redisURL = process.env.REDIS_URL || 'redis://localhost:6379';
-var redisClient = redis.createClient();
+/*var redisURL = process.env.REDIS_URL || 'redis://localhost:6379';
+var redisClient = redis.createClient();*/
 
 var controller = Botkit.slackbot({
     debug: true
