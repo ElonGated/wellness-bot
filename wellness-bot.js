@@ -40,11 +40,12 @@ var bot = controller.spawn({
     //even
     var sayActivityListEven = function(){
         redisClient.llen('activitylist', function(err, length) {
-            var randomnumber = (Math.floor(Math.random() * (length - 0 + 1)) + 0)-1;
-            if (randomnumber % 2 != 0 && randomnumber != length) {
+            var trueLength = length - 1;
+            var randomnumber = (Math.floor(Math.random() * (trueLength - 0 + 1)) + 0)-1;
+            if (randomnumber % 2 != 0 && randomnumber != trueLength) {
                 randomnumber += 1;
                 sayActivity(randomnumber);
-            } else if (randomnumber % 2 != 0 && randomnumber == length) {
+            } else if (randomnumber % 2 != 0 && randomnumber == trueLength) {
                 randomnumber -= 1;
                 sayActivity(randomnumber);
             } else {
@@ -54,7 +55,8 @@ var bot = controller.spawn({
     }
     var sayActivityListOdd = function(){
         redisClient.llen('activitylist', function(err, length) {
-            var randomnumber = (Math.floor(Math.random() * (length - 0 + 1)) + 0)-1;
+            var trueLength = length -1;
+            var randomnumber = (Math.floor(Math.random() * (trueLength - 0 + 1)) + 0)-1;
             if (randomnumber % 2 == 0 && randomnumber != 0) {
                 randomnumber -= 1;
                 sayActivity(randomnumber);
