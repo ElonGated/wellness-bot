@@ -29,7 +29,7 @@ var bot = controller.spawn({
                 {
                     text: '<!here> ' + reply,
                     // to_your_health: G1BMRM341; to_your_health_dev: G1E2WPCEP;
-                    channel: 'G1E2WPCEP',
+                    channel: 'G1BMRM341',
                 }
             );
         });
